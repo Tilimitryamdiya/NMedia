@@ -66,7 +66,7 @@
         android:layout_marginTop="@dimen/indent"
         android:autoLink="web"
         android:padding="@dimen/padding_to_barrier"
-        android:text="@sample/posts.json/data/content"
+        tools:text="@sample/posts.json/data/content"
         app:layout_constraintTop_toBottomOf="@id/barrierTop" />
 
     <androidx.constraintlayout.widget.Barrier
@@ -92,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_button_text"
-        android:text="@sample/posts.json/reactions/likes"
+        tools:text="@sample/posts.json/reactions/likes"
         app:layout_constraintBottom_toBottomOf="@id/likeButton"
         app:layout_constraintStart_toEndOf="@id/likeButton"
         app:layout_constraintTop_toTopOf="@id/likeButton" />
@@ -115,7 +115,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_button_text"
-        android:text="@sample/posts.json/reactions/shares"
+        tools:text="@sample/posts.json/reactions/shares"
         app:layout_constraintBottom_toBottomOf="@id/shareButton"
         app:layout_constraintStart_toEndOf="@id/shareButton"
         app:layout_constraintTop_toTopOf="@id/shareButton" />
@@ -124,7 +124,7 @@
         android:id="@+id/countViews"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@sample/posts.json/reactions/views"
+        tools:text="@sample/posts.json/reactions/views"
         app:layout_constraintBottom_toBottomOf="@id/countShares"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/countShares" />
