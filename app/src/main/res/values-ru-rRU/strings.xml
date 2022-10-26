@@ -7,4 +7,11 @@
     <string name="description_like_button">Лайки поста</string>
     <string name="description_share_button">Поделились постом</string>
     <string name="description_views_button">Просмотры поста</string>
+    <string name="menu_edit">Редактировать</string>
+    <string name="menu_delete">Удалить</string>
+    <string name="error_empty_content">Контент не может быть пустым</string>
+    <string name="post_text">Текст поста</string>
+    <string name="description_post_like">Добавить пост</string>
+    <string name="edit_message">Редактирование</string>
+    <string name="cancel">Отмена</string>
 </resources>
