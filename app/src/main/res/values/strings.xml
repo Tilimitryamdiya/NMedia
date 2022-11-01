@@ -6,12 +6,15 @@
     <string name="description_like_button">Like</string>
     <string name="description_share_button">Share</string>
     <string name="description_views_button">Views</string>
-    <string name="post_text" >Post text</string>
-    <string name="description_post_like" >Add post</string>
+    <string name="post_text">Post text</string>
+    <string name="description_post_add">Add post</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_delete">Delete</string>
     <string name="error_empty_content">Content can\'t be empty</string>
     <string name="edit_message">Edit message</string>
     <string name="cancel">Cancel</string>
-
+    <string name="chooser_share_post">Share post</string>
+    <string name="description_post_save">Save post</string>
+    <string name="description_video">Video</string>
+    <string name="description_play_video">Play video</string>
 </resources>

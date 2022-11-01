@@ -66,16 +66,41 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/common_spacing"
         android:autoLink="web"
-        android:padding="@dimen/padding_to_barrier"
+        android:paddingBottom="@dimen/padding_to_barrier"
         app:layout_constraintTop_toBottomOf="@id/barrierTop"
         tools:text="@sample/posts.json/data/content" />
+
+    <FrameLayout
+        android:id="@+id/video_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:contentDescription="@string/description_video"
+            android:src="@drawable/video" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.AppTheme.Buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="false"
+            app:icon="@drawable/ic_play_48" />
+
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/footer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="content" />
+        app:constraint_referenced_ids="video_preview" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
@@ -108,6 +133,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/share"
         tools:text="@sample/posts.json/reactions/views" />
-    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
