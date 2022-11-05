@@ -12,9 +12,9 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
+
     fun bind(post: Post) {
         binding.apply {
-
             author.text = post.author
             published.text = post.published
 
@@ -57,6 +57,10 @@ class PostViewHolder(
                 onInteractionListener.onShare(post)
             }
             share.text = AndroidUtils.getFormattedNumber(post.shared)
+
+            cardPost.setOnClickListener {
+                onInteractionListener.onPost(post)
+            }
         }
     }
 }
