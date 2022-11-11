@@ -10,7 +10,6 @@ import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.fragment_new_post.*
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
@@ -22,27 +21,23 @@ class NewPostFragment : Fragment() {
     private lateinit var binding: FragmentNewPostBinding
     private val preferences by lazy { this.activity?.getPreferences(Context.MODE_PRIVATE) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            preferences?.edit()?.apply {
-                if (arguments?.textArg == edit.text.toString()) {
-                    return@apply
-                } else {
-                    putString(SAVE_KEY, edit.text.toString())
-                    apply()
-                }
-            }
-            findNavController().navigateUp()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentNewPostBinding.inflate(inflater, container, false)
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            preferences?.edit()?.apply {
+                if (arguments?.textArg == binding.edit.text.toString()) {
+                    return@apply
+                } else {
+                    putString(SAVE_KEY, binding.edit.text.toString())
+                    apply()
+                }
+            }
+            findNavController().navigateUp()
+        }
         return binding.root
     }
 
