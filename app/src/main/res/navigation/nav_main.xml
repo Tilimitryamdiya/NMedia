@@ -12,23 +12,15 @@
         tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_newPostFragment"
-            app:destination="@id/newPostFragment" />
-        <action
-            android:id="@+id/action_feedFragment_to_postFragment"
-            app:destination="@id/postFragment" />
+            app:destination="@id/newPostFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"
         android:name="ru.netology.nmedia.activity.NewPostFragment"
-        android:label="NewPostFragment"
+        android:label="fragment_new_post"
         tools:layout="@layout/fragment_new_post" />
-    <fragment
-        android:id="@+id/postFragment"
-        android:name="ru.netology.nmedia.activity.PostFragment"
-        android:label="PostFragment"
-        tools:layout="@layout/fragment_post">
-        <action
-            android:id="@+id/action_postFragment_to_newPostFragment"
-            app:destination="@id/newPostFragment" />
-    </fragment>
 </navigation>
