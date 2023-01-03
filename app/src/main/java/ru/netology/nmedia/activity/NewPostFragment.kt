@@ -1,14 +1,11 @@
 package ru.netology.nmedia.activity
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.util.AndroidUtils
@@ -17,54 +14,35 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 
 class NewPostFragment : Fragment() {
 
-    private val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
-    private lateinit var binding: FragmentNewPostBinding
-    private val preferences by lazy { this.activity?.getPreferences(Context.MODE_PRIVATE) }
+    companion object {
+        var Bundle.textArg: String? by StringArg
+    }
+
+    private val viewModel: PostViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentNewPostBinding.inflate(inflater, container, false)
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            preferences?.edit()?.apply {
-                if (arguments?.textArg == binding.edit.text.toString()) {
-                    return@apply
-                } else {
-                    putString(SAVE_KEY, binding.edit.text.toString())
-                    apply()
-                }
-            }
+        val binding = FragmentNewPostBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        arguments?.textArg
+            ?.let(binding.edit::setText)
+
+        binding.ok.setOnClickListener {
+            viewModel.changeContent(binding.edit.text.toString())
+            viewModel.save()
+            AndroidUtils.hideKeyboard(requireView())
+        }
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
             findNavController().navigateUp()
         }
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.edit.requestFocus()
-        arguments?.textArg?.let(binding.edit::setText) ?: preferences?.getString(SAVE_KEY, "")
-            .let(binding.edit::setText)
-
-        binding.ok.setOnClickListener {
-            val text = binding.edit.text.toString()
-            if (text.isNotBlank()) {
-                viewModel.changeContent(text)
-                viewModel.save()
-            }
-            preferences?.edit {
-                clear()
-                commit()
-            }
-            AndroidUtils.hideKeyboard(requireView())
-            findNavController().navigateUp()
-        }
-    }
-
-    companion object {
-        const val SAVE_KEY = "save"
-        var Bundle.textArg by StringArg
     }
 }

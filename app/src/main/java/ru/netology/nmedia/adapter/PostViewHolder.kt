@@ -1,6 +1,5 @@
 package ru.netology.nmedia.adapter
 
-import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.util.AndroidUtils
@@ -39,13 +38,6 @@ class PostViewHolder(
 
             content.text = post.content
 
-            if (post.video != "") videoPreview.visibility = View.VISIBLE
-            else videoPreview.visibility = View.GONE
-            videoPreview.setOnClickListener {
-                onInteractionListener.onPlay(post)
-            }
-
-
             like.isChecked = post.likedByMe
             like.text = post.likes.toString()
 
@@ -58,9 +50,6 @@ class PostViewHolder(
             }
             share.text = AndroidUtils.getFormattedNumber(post.shared)
 
-            cardPost.setOnClickListener {
-                onInteractionListener.onPost(post)
-            }
         }
     }
 }
