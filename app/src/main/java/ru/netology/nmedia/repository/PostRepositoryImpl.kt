@@ -21,7 +21,6 @@ class PostRepositoryImpl : PostRepository {
         private const val BASE_URL = "http://10.0.2.2:9999"
         private val jsonType = "application/json".toMediaType()
     }
-
     override fun getAll(callback: PostRepository.PostCallback<List<Post>>) {
         val request: Request = Request.Builder()
             .url("${BASE_URL}/api/slow/posts")
