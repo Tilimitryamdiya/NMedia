@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -13,8 +14,8 @@ class PostViewHolder(
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val avatarUrl = "http://10.0.2.2:9999/avatars/"
-    private val attachmentUrl = "http://10.0.2.2:9999/images/"
+    private val avatarUrl = "${BuildConfig.BASE_URL}/avatars/"
+    private val attachmentUrl = "${BuildConfig.BASE_URL}/images/"
 
     fun bind(post: Post) {
         binding.apply {
@@ -65,6 +66,8 @@ class PostViewHolder(
                     .load(attachmentUrl + post.attachment.url)
                     .timeout(10_000)
                     .into(binding.attachment)
+            } else {
+                attachment.visibility = View.GONE
             }
 
         }
