@@ -46,7 +46,7 @@ class NewPostFragment : Fragment() {
             viewModel.loadPosts()
         }
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
+        viewModel.dataState.observe(viewLifecycleOwner) { state ->
             if (state.error) {
                 Toast.makeText(context, R.string.error_loading, Toast.LENGTH_SHORT).show()
             }
