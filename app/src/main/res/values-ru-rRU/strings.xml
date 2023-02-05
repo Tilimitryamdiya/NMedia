@@ -23,8 +23,10 @@
     <string name="channel_remote_name">Уведомления с сервера</string>
     <string name="channel_remote_description">Уведомления с удалённого сервера</string>
     <string name="notification_new_post">%1$s опубликовал новый пост:</string>
-    <string name="notification_default" >Новое уведомление от НМедиа</string>
+    <string name="notification_default">Новое уведомление от НМедиа</string>
     <string name="retry_loading">Повторить</string>
     <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
     <string name="error_loading">Что-то пошло не так. Попробуйте позднее</string>
+    <string name="load_new_posts_button">Новые записи</string>
+    <string name="description_load_new_posts">Загрузить новые записи</string>
 </resources>
