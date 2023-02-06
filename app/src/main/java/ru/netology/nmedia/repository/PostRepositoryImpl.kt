@@ -47,7 +47,6 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun showNewerPosts() {
         dao.readAll()
-        dao.getAll()
     }
 
     override suspend fun getAll() {
