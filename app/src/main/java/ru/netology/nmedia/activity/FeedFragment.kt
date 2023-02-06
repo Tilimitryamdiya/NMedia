@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
@@ -53,7 +54,17 @@ class FeedFragment : Fragment() {
                 startActivity(shareIntent)
             }
         })
+
         binding.list.adapter = adapter
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                if (positionStart == 0) {
+                    binding.list.smoothScrollToPosition(0)
+                }
+            }
+        })
+
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
@@ -63,13 +74,26 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
+
         viewModel.data.observe(viewLifecycleOwner) { data ->
             adapter.submitList(data.posts)
             binding.emptyText.isVisible = data.empty
         }
 
+        viewModel.newerCount.observe(viewLifecycleOwner) {
+            if (it != 0) {
+                binding.loadNewPosts.visibility = View.VISIBLE
+            }
+        }
+
+        binding.loadNewPosts.setOnClickListener {
+            viewModel.readAll()
+            binding.loadNewPosts.visibility = View.GONE
+        }
+
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
+            binding.loadNewPosts.visibility = View.GONE
         }
 
         binding.fab.setOnClickListener {

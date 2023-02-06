@@ -2,7 +2,10 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
@@ -28,6 +31,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             AppDb.getInstance(context = application).postDao()
         )
     val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
+        .asLiveData(Dispatchers.Default)
+    val newerCount: LiveData<Int> = data.switchMap {
+        val latestPostId = it.posts.firstOrNull()?.id ?: 0L
+        repository.getNewerCount(latestPostId).asLiveData()
+    }
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -61,6 +69,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun readAll() = viewModelScope.launch {
+        withContext(Dispatchers.Default) {
+            repository.showNewerPosts()
+        }
+        _dataState.value = FeedModelState()
+    }
+
     fun save() {
         edited.value?.let {
             if (it !== empty) {
@@ -75,41 +90,41 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-            edited.value = empty
-        }
+        edited.value = empty
+    }
 
-        fun edit(post: Post) {
-            edited.value = post
-        }
+    fun edit(post: Post) {
+        edited.value = post
+    }
 
-        fun changeContent(content: String) {
-            val text = content.trim()
-            if (edited.value?.content == text) {
-                return
+    fun changeContent(content: String) {
+        val text = content.trim()
+        if (edited.value?.content == text) {
+            return
+        }
+        edited.value = edited.value?.copy(content = text)
+    }
+
+    fun likeById(post: Post) {
+        viewModelScope.launch {
+            try {
+                repository.likeById(post)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
             }
-            edited.value = edited.value?.copy(content = text)
+
         }
+    }
 
-        fun likeById(post: Post) {
-            viewModelScope.launch {
-                try {
-                    repository.likeById(post)
-                    _dataState.value = FeedModelState()
-                } catch (e: Exception) {
-                    _dataState.value = FeedModelState(error = true)
-                }
-
-            }
-        }
-
-        fun removeById(id: Long) {
-            viewModelScope.launch {
-                try {
-                    repository.removeById(id)
-                    _dataState.value = FeedModelState()
-                } catch (e: Exception) {
-                    _dataState.value = FeedModelState(error = true)
-                }
+    fun removeById(id: Long) {
+        viewModelScope.launch {
+            try {
+                repository.removeById(id)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
             }
         }
     }
+}

@@ -8,6 +8,7 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.view.loadCircleCrop
 
 class PostViewHolder(
     private val binding: CardPostBinding,
@@ -20,16 +21,11 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-
-            Glide.with(avatar)
-                .load(avatarUrl + post.authorAvatar)
-                .circleCrop()
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .into(avatar)
-
+            avatar.loadCircleCrop(avatarUrl + post.authorAvatar)
             published.text = post.published
+            content.text = post.content
+            like.isChecked = post.likedByMe
+            like.text = post.likes.toString()
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -50,11 +46,6 @@ class PostViewHolder(
                 }.show()
             }
 
-            content.text = post.content
-
-            like.isChecked = post.likedByMe
-            like.text = post.likes.toString()
-
             like.setOnClickListener {
                 onInteractionListener.onLike(post)
             }
@@ -69,7 +60,6 @@ class PostViewHolder(
             } else {
                 attachment.visibility = View.GONE
             }
-
         }
     }
 }
