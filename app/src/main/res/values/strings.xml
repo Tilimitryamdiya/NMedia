@@ -28,4 +28,13 @@
     <string name="error_loading">Something went wrong. Try again later</string>
     <string name="load_new_posts_button">New posts</string>
     <string name="description_load_new_posts">Load new posts</string>
+    <string name="add_post">Add post</string>
+    <string name="clear">Clear</string>
+    <string name="fragment_feed_title">Feed</string>
+    <string name="fragment_new_post_title">New Post</string>
+    <string name="description_full_screen_image">Full screen image</string>
+    <string name="image">Image</string>
+    <string name="description_preview">Image preview</string>
+    <string name="description_choose_gallery">Choose image from the gallery</string>
+    <string name="description_make_photo">Make a photo</string>
 </resources>

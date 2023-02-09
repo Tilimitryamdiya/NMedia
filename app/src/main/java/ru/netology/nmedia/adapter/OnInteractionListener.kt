@@ -9,4 +9,5 @@ interface OnInteractionListener {
     fun onEdit(post: Post)
     fun onPlay(post: Post) {}
     fun onPost(post: Post) {}
+    fun onAttachment(post: Post)
 }

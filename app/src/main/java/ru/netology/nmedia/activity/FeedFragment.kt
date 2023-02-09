@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.ImageFragment.Companion.attachUrl
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -52,6 +53,15 @@ class FeedFragment : Fragment() {
                 val shareIntent =
                     Intent.createChooser(intent, getString(R.string.chooser_share_post))
                 startActivity(shareIntent)
+            }
+
+            override fun onAttachment(post: Post) {
+                if (post.attachment != null) {
+                    findNavController().navigate(
+                        R.id.action_feedFragment_to_imageFragment,
+                        Bundle().apply { attachUrl = post.attachment.url }
+                    )
+                }
             }
         })
 

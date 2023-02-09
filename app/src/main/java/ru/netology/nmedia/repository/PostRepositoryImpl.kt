@@ -7,16 +7,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
 import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import ru.netology.nmedia.model.MediaModel
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override val data = dao.getAll()
@@ -77,6 +83,36 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         } catch (e: Exception) {
             throw UnknownError
         }
+    }
+
+    override suspend fun saveWithAttachment(post: Post, mediaModel: MediaModel) {
+        try {
+            val media = upload(mediaModel)
+
+            val response = PostsApi.service.save(post.copy(
+                attachment = Attachment(media.id, AttachmentType.IMAGE),
+            ))
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.insert(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    private suspend fun upload(media: MediaModel): Media {
+        val part = MultipartBody.Part.createFormData(
+            "file", media.file.name, media.file.asRequestBody()
+        )
+        val response = PostsApi.service.uploadMedia(part)
+        if (!response.isSuccessful) {
+            throw ApiError(response.code(), response.message())
+        }
+        return requireNotNull(response.body())
     }
 
     override suspend fun removeById(id: Long) {

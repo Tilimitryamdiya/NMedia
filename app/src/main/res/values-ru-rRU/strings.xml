@@ -29,4 +29,13 @@
     <string name="error_loading">Что-то пошло не так. Попробуйте позднее</string>
     <string name="load_new_posts_button">Новые записи</string>
     <string name="description_load_new_posts">Загрузить новые записи</string>
+    <string name="add_post">Добавить пост</string>
+    <string name="clear">Очистить</string>
+    <string name="fragment_feed_title">Лента</string>
+    <string name="fragment_new_post_title">Новый пост</string>
+    <string name="description_full_screen_image">Полноэкранное изображение</string>
+    <string name="image">Изображение</string>
+    <string name="description_preview">Предпросмотр изображения</string>
+    <string name="description_choose_gallery">Выбрать изображение из галереи</string>
+    <string name="description_make_photo">Сделать фото</string>
 </resources>
