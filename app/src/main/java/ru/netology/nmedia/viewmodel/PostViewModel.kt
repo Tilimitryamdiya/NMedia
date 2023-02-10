@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -10,8 +11,10 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.model.MediaModel
 import ru.netology.nmedia.repository.*
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
 
 private val empty = Post(
     id = 0,
@@ -41,12 +44,25 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         get() = _dataState
 
     private val edited = MutableLiveData(empty)
+
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
+    private val _media = MutableLiveData<MediaModel?>(null)
+    val media: LiveData<MediaModel?>
+        get() = _media
+
     init {
         loadPosts()
+    }
+
+    fun changePhoto(uri: Uri, file: File) {
+        _media.value = MediaModel(uri, file)
+    }
+
+    fun clearPhoto() {
+        _media.value = null
     }
 
     fun loadPosts() = viewModelScope.launch {
@@ -81,8 +97,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             if (it !== empty) {
                 viewModelScope.launch {
                     try {
-                        repository.save(it)
+                        when (val media = media.value) {
+                            null -> repository.save(it)
+                            else -> {
+                                repository.saveWithAttachment(it, media)
+                            }
+                        }
                         _postCreated.value = Unit
+                        edited.value = empty
+                        clearPhoto()
                         _dataState.value = FeedModelState()
                     } catch (e: Exception) {
                         _dataState.value = FeedModelState(error = true)
@@ -90,7 +113,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-        edited.value = empty
     }
 
     fun edit(post: Post) {

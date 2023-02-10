@@ -3,11 +3,11 @@ package ru.netology.nmedia.adapter
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.view.loadAttachment
 import ru.netology.nmedia.view.loadCircleCrop
 
 class PostViewHolder(
@@ -16,7 +16,7 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val avatarUrl = "${BuildConfig.BASE_URL}/avatars/"
-    private val attachmentUrl = "${BuildConfig.BASE_URL}/images/"
+    private val attachmentUrl = "${BuildConfig.BASE_URL}/media/"
 
     fun bind(post: Post) {
         binding.apply {
@@ -52,13 +52,13 @@ class PostViewHolder(
 
             if (post.attachment != null) {
                 attachment.visibility = View.VISIBLE
-                attachment.contentDescription = post.attachment.description
-                Glide.with(attachment)
-                    .load(attachmentUrl + post.attachment.url)
-                    .timeout(10_000)
-                    .into(binding.attachment)
+                attachment.loadAttachment(attachmentUrl + post.attachment.url)
             } else {
                 attachment.visibility = View.GONE
+            }
+
+            attachment.setOnClickListener {
+                onInteractionListener.onAttachment(post)
             }
         }
     }
