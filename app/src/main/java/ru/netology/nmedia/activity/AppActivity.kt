@@ -2,8 +2,13 @@ package ru.netology.nmedia.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,11 +19,15 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.viewmodel.AuthViewModel
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
     lateinit var appBarConfiguration: AppBarConfiguration
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment
 
         intent?.let {
             if (it.action != Intent.ACTION_SEND) {
@@ -30,19 +39,50 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 return@let
             }
             intent.removeExtra(Intent.EXTRA_TEXT)
-            val navHostFragment =
-                supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment
+
             navHostFragment.navController.navigate(
                 R.id.action_feedFragment_to_newPostFragment,
                 Bundle().apply { textArg = text }
             )
         }
 
-            val navHostFragment =
-                supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment
-            val navController = navHostFragment.navController
-            appBarConfiguration = AppBarConfiguration(navController.graph)
-            setupActionBarWithNavController(navController, appBarConfiguration)
+        val authViewModel by viewModels<AuthViewModel>()
+
+        var previousMenuProvider: MenuProvider? = null
+
+        authViewModel.data.observe(this) {
+            previousMenuProvider?.let(::removeMenuProvider)
+            addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_auth, menu)
+
+                    menu.setGroupVisible(R.id.unauthorized, !authViewModel.authorized)
+                    menu.setGroupVisible(R.id.authorized, authViewModel.authorized)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                    when (menuItem.itemId) {
+                        R.id.login -> {
+                            navHostFragment.navController
+                                .navigate(R.id.action_feedFragment_to_loginFragment)
+                            true
+                        }
+                        R.id.register -> {
+                            true
+                        }
+
+                        R.id.logout -> {
+                            authViewModel.logout()
+                            true
+                        }
+                        else -> false
+                    }
+            }.also { previousMenuProvider = it })
+        }
+
+        val navController = navHostFragment.navController
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
         checkGoogleApiAvailability()
     }
@@ -65,6 +105,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             println(it)
         }
     }
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.container)
         return navController.navigateUp(appBarConfiguration)

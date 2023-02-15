@@ -38,4 +38,10 @@
     <string name="description_preview">Предпросмотр изображения</string>
     <string name="description_choose_gallery">Выбрать изображение из галереи</string>
     <string name="description_make_photo">Сделать фото</string>
+    <string name="signIn">Войти</string>
+    <string name="signOut">Выйти</string>
+    <string name="register">Регистрация</string>
+    <string name="your_login">Логин</string>
+    <string name="your_password">Пароль</string>
+    <string name="login_now">Войти</string>
 </resources>
