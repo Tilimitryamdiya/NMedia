@@ -44,4 +44,5 @@
     <string name="your_login">Логин</string>
     <string name="your_password">Пароль</string>
     <string name="login_now">Войти</string>
+    <string name="confirm_signOut">Вы уверены?</string>
 </resources>

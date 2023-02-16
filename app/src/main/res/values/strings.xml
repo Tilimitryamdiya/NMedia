@@ -43,4 +43,5 @@
     <string name="your_login">Your login</string>
     <string name="your_password">Your password</string>
     <string name="login_now">Login Now</string>
+    <string name="confirm_signOut">Are you sure?</string>
 </resources>

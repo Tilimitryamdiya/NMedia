@@ -19,10 +19,12 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.dialog.SignOutDialog
 import ru.netology.nmedia.viewmodel.AuthViewModel
 
-class AppActivity : AppCompatActivity(R.layout.activity_app) {
+class AppActivity : AppCompatActivity(R.layout.activity_app), SignOutDialog.ConfirmationListener {
     lateinit var appBarConfiguration: AppBarConfiguration
+    private val authViewModel by viewModels<AuthViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,8 +47,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                 Bundle().apply { textArg = text }
             )
         }
-
-        val authViewModel by viewModels<AuthViewModel>()
 
         var previousMenuProvider: MenuProvider? = null
 
@@ -72,7 +72,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                         }
 
                         R.id.logout -> {
-                            authViewModel.logout()
+                            authViewModel.confirmLogout(supportFragmentManager)
                             true
                         }
                         else -> false
@@ -110,5 +110,10 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         val navController = findNavController(R.id.container)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun confirmButtonClicked() {
+        authViewModel.logout()
+        findNavController(R.id.container).navigateUp()
     }
 }
