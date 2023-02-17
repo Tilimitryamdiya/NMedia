@@ -64,10 +64,12 @@ class AppActivity : AppCompatActivity(R.layout.activity_app), SignOutDialog.Conf
                     when (menuItem.itemId) {
                         R.id.login -> {
                             navHostFragment.navController
-                                .navigate(R.id.action_feedFragment_to_loginFragment)
+                                .navigate(R.id.loginFragment)
                             true
                         }
                         R.id.register -> {
+                            navHostFragment.navController
+                                .navigate(R.id.registerFragment)
                             true
                         }
 

@@ -26,8 +26,8 @@ class LoginFragment : Fragment() {
 
         with(binding) {
             loginButton.setOnClickListener {
-                val login = enterLogin.text.toString()
-                val password = enterPassword.text.toString()
+                val login = signUpLogin.text.toString()
+                val password = signUpPassword.text.toString()
                 viewModel.login(login, password)
             }
         }
@@ -43,7 +43,7 @@ class LoginFragment : Fragment() {
             if (state.isBlank) {
                 Snackbar.make(
                     binding.root,
-                    "Login or password is blank",
+                    R.string.blankAuth,
                     Snackbar.LENGTH_LONG
                 ).show()
             }
@@ -51,7 +51,7 @@ class LoginFragment : Fragment() {
             if (state.invalidLoginOrPass) {
                 Snackbar.make(
                     binding.root,
-                    "Invalid login/password",
+                    R.string.invalidAuth,
                     Snackbar.LENGTH_LONG
                 ).show()
             }
