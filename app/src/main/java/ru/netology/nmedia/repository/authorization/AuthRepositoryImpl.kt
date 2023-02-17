@@ -1,5 +1,6 @@
 package ru.netology.nmedia.repository.authorization
 
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -56,10 +57,13 @@ class AuthRepositoryImpl : AuthRepository {
             val part = MultipartBody.Part.createFormData(
                 "file", media.file.name, media.file.asRequestBody()
             )
+            val loginRequestBody = login.toRequestBody("text/plain".toMediaType())
+            val passRequestBody = password.toRequestBody("text/plain".toMediaType())
+            val nameRequestBody = login.toRequestBody("text/plain".toMediaType())
             val response = PostsApi.service.registerWithPhoto(
-                login.toRequestBody(),
-                password.toRequestBody(),
-                name.toRequestBody(),
+                loginRequestBody,
+                passRequestBody,
+                nameRequestBody,
                 part
             )
             if (!response.isSuccessful) {
