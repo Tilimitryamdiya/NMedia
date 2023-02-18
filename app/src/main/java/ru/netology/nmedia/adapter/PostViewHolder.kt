@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.view.View
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
@@ -26,6 +27,8 @@ class PostViewHolder(
             content.text = post.content
             like.isChecked = post.likedByMe
             like.text = post.likes.toString()
+
+            menu.isVisible = post.ownedByMe
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {

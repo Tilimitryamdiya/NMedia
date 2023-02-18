@@ -37,4 +37,22 @@
     <string name="description_preview">Image preview</string>
     <string name="description_choose_gallery">Choose image from the gallery</string>
     <string name="description_make_photo">Make a photo</string>
+    с
+    <string name="signIn">Sign in</string>
+    <string name="signOut">Sign out</string>
+    <string name="register">Register</string>
+    <string name="your_login">Your login</string>
+    <string name="your_password">Your password</string>
+    <string name="login_now">Login Now</string>
+    <string name="invalidAuth">Invalid login/password</string>
+    <string name="blankAuth">Login or password is blank</string>
+    <string name="confirm_signOut">Are you sure?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="name">Name</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="match_passwords">Passwords must match</string>
+    <string name="blankRegister">Name, login or password is blank</string>
+
 </resources>

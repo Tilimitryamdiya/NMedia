@@ -38,4 +38,21 @@
     <string name="description_preview">Предпросмотр изображения</string>
     <string name="description_choose_gallery">Выбрать изображение из галереи</string>
     <string name="description_make_photo">Сделать фото</string>
+    <!-- Authorization, registration -->
+    <string name="signIn">Войти</string>
+    <string name="signOut">Выйти</string>
+    <string name="register">Регистрация</string>
+    <string name="your_login">Логин</string>
+    <string name="your_password">Пароль</string>
+    <string name="login_now">Войти</string>
+    <string name="invalidAuth">Неверный логин/пароль</string>
+    <string name="blankAuth">Не указан логин или пароль</string>
+    <string name="confirm_signOut">Вы уверены?</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="name">Имя</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="confirm_password">Подтвердите пароль</string>
+    <string name="match_passwords">Пароли должны совпадать</string>
+    <string name="blankRegister">Не указано имя, логин, или пароль</string>
 </resources>
