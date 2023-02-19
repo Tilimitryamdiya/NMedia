@@ -12,6 +12,7 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.model.AuthModel
 import java.util.concurrent.TimeUnit
 
@@ -42,7 +43,10 @@ private val retrofit = Retrofit.Builder()
     .client(okhttp)
     .build()
 
-interface PostsApiService {
+interface ApiService {
+    @POST("users/push-tokens")
+    suspend fun saveToken(@Body pushToken: PushToken)
+
     @GET("posts")
     suspend fun getAll(): Response<List<Post>>
 
@@ -94,8 +98,8 @@ interface PostsApiService {
     ): Response<AuthModel>
 }
 
-object PostsApi {
-    val service: PostsApiService by lazy {
-        retrofit.create(PostsApiService::class.java)
+object Api {
+    val service: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
     }
 }
