@@ -10,6 +10,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.R
+import ru.netology.nmedia.auth.AppAuth
 import kotlin.random.Random
 
 
@@ -25,28 +26,44 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        val receivedMessage = message.data[action] ?: return
-        if (Action.values().map { it.name }.contains(receivedMessage)) {
-            when (Action.valueOf(receivedMessage)) {
-                Action.LIKE -> handleLike(
-                    gson.fromJson(
-                        message.data[content], Like::class.java
+        if (checkRecipientId(message)) {
+            val receivedMessage = message.data[action]
+            if (receivedMessage != null) {
+                when (Action.valueOf(receivedMessage)) {
+                    Action.LIKE -> handleLike(
+                        gson.fromJson(
+                            message.data[content], Like::class.java
+                        )
                     )
-                )
-                Action.NEW_POST -> handleNewPost(
-                    gson.fromJson(
-                        message.data[content],
-                        NewPost::class.java
+                    Action.NEW_POST -> handleNewPost(
+                        gson.fromJson(
+                            message.data[content],
+                            NewPost::class.java
+                        )
                     )
-                )
+                }
+            } else {
+                defaultNotification()
             }
-        } else {
-            defaultNotification()
         }
     }
 
     override fun onNewToken(token: String) {
-        println(token)
+        AppAuth.getInstance().sendPushToken(token)
+    }
+
+    private fun checkRecipientId(message: RemoteMessage): Boolean {
+        val recipientId = gson.fromJson(message.data[content], AuthMessage::class.java).recipientId
+        val authId = AppAuth.getInstance().data.value?.id
+        return when {
+            recipientId == authId || recipientId == null -> true
+            recipientId == 0L || recipientId != 0L -> {
+                AppAuth.getInstance()
+                    .sendPushToken(AppAuth.getInstance().data.value?.token)
+                false
+            }
+            else -> false
+        }
     }
 
     private fun notificationChannelReg() {

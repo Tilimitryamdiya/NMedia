@@ -15,3 +15,8 @@ data class NewPost(
     val postId: Long,
     val content: String
 ): NotificationsContent()
+
+data class AuthMessage(
+    val recipientId: Long?,
+    val content: String?
+): NotificationsContent()

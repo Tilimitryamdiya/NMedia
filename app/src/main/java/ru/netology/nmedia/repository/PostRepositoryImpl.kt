@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
-import ru.netology.nmedia.api.PostsApi
+import ru.netology.nmedia.api.Api
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Media
@@ -33,7 +33,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         while (true) {
             delay(10_000)
             try {
-                val response = PostsApi.service.getNewer(latestId)
+                val response = Api.service.getNewer(latestId)
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())
                 }
@@ -57,7 +57,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun getAll() {
         try {
-            val response = PostsApi.service.getAll()
+            val response = Api.service.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -72,7 +72,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun save(post: Post) {
         try {
-            val response = PostsApi.service.save(post)
+            val response = Api.service.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -89,7 +89,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         try {
             val media = upload(mediaModel)
 
-            val response = PostsApi.service.save(post.copy(
+            val response = Api.service.save(post.copy(
                 attachment = Attachment(media.id, AttachmentType.IMAGE),
             ))
             if (!response.isSuccessful) {
@@ -108,7 +108,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         val part = MultipartBody.Part.createFormData(
             "file", media.file.name, media.file.asRequestBody()
         )
-        val response = PostsApi.service.uploadMedia(part)
+        val response = Api.service.uploadMedia(part)
         if (!response.isSuccessful) {
             throw ApiError(response.code(), response.message())
         }
@@ -119,7 +119,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         val postToDelete = dao.getPostById(id)
         dao.removeById(id)
         try {
-            val response = PostsApi.service.removeById(id)
+            val response = Api.service.removeById(id)
             if (!response.isSuccessful) {
                 dao.insert(postToDelete)
                 throw ApiError(response.code(), response.message())
@@ -137,9 +137,9 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         try {
             val response =
                 if (!post.likedByMe) {
-                    PostsApi.service.likeById(post.id)
+                    Api.service.likeById(post.id)
                 } else {
-                    PostsApi.service.dislikeById(post.id)
+                    Api.service.dislikeById(post.id)
                 }
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
