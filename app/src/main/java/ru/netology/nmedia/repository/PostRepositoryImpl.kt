@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
-import ru.netology.nmedia.api.Api
+import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Media
@@ -23,8 +23,12 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import ru.netology.nmedia.model.MediaModel
+import javax.inject.Inject
 
-class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
+class PostRepositoryImpl @Inject constructor(
+    private val dao: PostDao,
+    private val apiService: ApiService
+) : PostRepository {
     override val data = dao.getAll()
         .map(List<PostEntity>::toDto)
         .flowOn(Dispatchers.Default)
@@ -33,7 +37,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         while (true) {
             delay(10_000)
             try {
-                val response = Api.service.getNewer(latestId)
+                val response = apiService.getNewer(latestId)
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())
                 }
@@ -57,7 +61,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun getAll() {
         try {
-            val response = Api.service.getAll()
+            val response = apiService.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -72,7 +76,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun save(post: Post) {
         try {
-            val response = Api.service.save(post)
+            val response = apiService.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -89,7 +93,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         try {
             val media = upload(mediaModel)
 
-            val response = Api.service.save(post.copy(
+            val response = apiService.save(post.copy(
                 attachment = Attachment(media.id, AttachmentType.IMAGE),
             ))
             if (!response.isSuccessful) {
@@ -108,7 +112,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         val part = MultipartBody.Part.createFormData(
             "file", media.file.name, media.file.asRequestBody()
         )
-        val response = Api.service.uploadMedia(part)
+        val response = apiService.uploadMedia(part)
         if (!response.isSuccessful) {
             throw ApiError(response.code(), response.message())
         }
@@ -119,7 +123,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         val postToDelete = dao.getPostById(id)
         dao.removeById(id)
         try {
-            val response = Api.service.removeById(id)
+            val response = apiService.removeById(id)
             if (!response.isSuccessful) {
                 dao.insert(postToDelete)
                 throw ApiError(response.code(), response.message())
@@ -137,9 +141,9 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         try {
             val response =
                 if (!post.likedByMe) {
-                    Api.service.likeById(post.id)
+                    apiService.likeById(post.id)
                 } else {
-                    Api.service.dislikeById(post.id)
+                    apiService.dislikeById(post.id)
                 }
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())

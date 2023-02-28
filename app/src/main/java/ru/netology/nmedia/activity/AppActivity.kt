@@ -17,14 +17,18 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.dialog.SignOutDialog
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app), SignOutDialog.ConfirmationListener {
     lateinit var appBarConfiguration: AppBarConfiguration
-    private val authViewModel by viewModels<AuthViewModel>()
+    private val authViewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,11 +90,14 @@ class AppActivity : AppCompatActivity(R.layout.activity_app), SignOutDialog.Conf
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        checkGoogleApiAvailability()
     }
 
-    private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+    @Inject
+    fun checkGoogleApiAvailability(
+        firebaseMessaging: FirebaseMessaging,
+        googleApiAvailability: GoogleApiAvailability
+    ) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -103,7 +110,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app), SignOutDialog.Conf
                 .show()
         }
 
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+        firebaseMessaging.token.addOnSuccessListener {
             println(it)
         }
     }
