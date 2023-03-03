@@ -1,9 +1,9 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
 import android.net.Uri
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dialog.SignInDialog
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
@@ -20,6 +19,7 @@ import ru.netology.nmedia.model.MediaModel
 import ru.netology.nmedia.repository.*
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
+import javax.inject.Inject
 
 private val empty = Post(
     id = 0,
@@ -33,16 +33,15 @@ private val empty = Post(
     attachment = null
 )
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
-    // упрощённый вариант
-    private val repository: PostRepository =
-        PostRepositoryImpl(
-            AppDb.getInstance(context = application).postDao()
-        )
+@HiltViewModel
+class PostViewModel @Inject constructor(
+    private val repository: PostRepository,
+    private val appAuth: AppAuth
+) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val data: LiveData<FeedModel> =
-        AppAuth.getInstance().data
+        appAuth.data
             .flatMapLatest { authState ->
                 repository.data.map { posts ->
                     FeedModel(
@@ -85,7 +84,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isAuthorized(manager: FragmentManager): Boolean {
-        return if (AppAuth.getInstance().data.value != null) {
+        return if (appAuth.data.value != null) {
             true
         } else {
             SignInDialog().show(manager, SignInDialog.TAG)
