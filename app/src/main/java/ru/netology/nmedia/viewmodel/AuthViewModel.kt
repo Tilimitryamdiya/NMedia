@@ -20,12 +20,12 @@ class AuthViewModel @Inject constructor(
     private val appAuth: AppAuth
 ): ViewModel() {
 
-    val data: LiveData<AuthModel?> = appAuth
-        .data
+    val data: LiveData<AuthModel> = appAuth
+        .authState
         .asLiveData(Dispatchers.Default)
 
     val authorized: Boolean
-        get() = data.value != null
+        get() = data.value != AuthModel()
 
     private val _state = MutableLiveData<AuthModelState>()
     val state: LiveData<AuthModelState>

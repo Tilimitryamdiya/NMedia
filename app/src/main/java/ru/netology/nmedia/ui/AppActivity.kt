@@ -1,4 +1,4 @@
-package ru.netology.nmedia.activity
+package ru.netology.nmedia.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -19,7 +19,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.dialog.SignOutDialog
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import javax.inject.Inject

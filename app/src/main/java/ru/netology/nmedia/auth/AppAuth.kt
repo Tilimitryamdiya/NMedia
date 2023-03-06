@@ -27,27 +27,26 @@ class AppAuth @Inject constructor(
 ) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
 
-    private val _data: MutableStateFlow<AuthModel?>
+    private val _authState: MutableStateFlow<AuthModel>
 
     init {
         val token = prefs.getString(TOKEN_KEY, null)
         val id = prefs.getLong(ID_KEY, 0L)
 
         if (token == null || id == 0L) {
-            _data = MutableStateFlow(null)
-
+            _authState = MutableStateFlow(AuthModel())
             prefs.edit { clear() }
         } else {
-            _data = MutableStateFlow(AuthModel(id, token))
+            _authState = MutableStateFlow(AuthModel(id, token))
         }
         sendPushToken()
     }
 
-    val data = _data.asStateFlow()
+    val authState = _authState.asStateFlow()
 
     @Synchronized
-    fun setAuth(id: Long, token: String) {
-        _data.value = AuthModel(id, token)
+    fun setAuth(id: Long, token: String?) {
+        _authState.value = AuthModel(id, token)
         prefs.edit {
             putLong(ID_KEY, id)
             putString(TOKEN_KEY, token)
@@ -57,7 +56,7 @@ class AppAuth @Inject constructor(
 
     @Synchronized
     fun removeAuth() {
-        _data.value = null
+        _authState.value = AuthModel()
         prefs.edit { clear() }
         sendPushToken()
     }

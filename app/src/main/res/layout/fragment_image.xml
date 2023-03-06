@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context=".activity.ImageFragment">
+    tools:context=".ui.ImageFragment">
 
     <ImageView
         android:id="@+id/fullscreenImage"
