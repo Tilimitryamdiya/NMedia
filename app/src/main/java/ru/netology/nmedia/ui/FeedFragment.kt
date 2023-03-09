@@ -95,12 +95,6 @@ class FeedFragment : Fragment() {
             viewModel.data.collectLatest(adapter::submitData)
         }
 
-//        lifecycleScope.launchWhenCreated {
-//            viewModel.authState.collectLatest {
-//                adapter.refresh()
-//            }
-//        }
-
         binding.loadNewPosts.setOnClickListener {
             viewModel.readAll()
             binding.loadNewPosts.visibility = View.GONE

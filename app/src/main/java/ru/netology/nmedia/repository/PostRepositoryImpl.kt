@@ -1,18 +1,20 @@
 package ru.netology.nmedia.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
+import androidx.paging.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
@@ -26,14 +28,26 @@ import ru.netology.nmedia.model.MediaModel
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
-    private val dao: PostDao,
-    private val apiService: ApiService
+    private val postDao: PostDao,
+    private val apiService: ApiService,
+    postRemoteKeyDao: PostRemoteKeyDao,
+    appDb: AppDb
 ) : PostRepository {
 
-    override val data = Pager(
-        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
-        pagingSourceFactory = { PostPagingSource(apiService) },
+    @OptIn(ExperimentalPagingApi::class)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 25),
+        remoteMediator = PostRemoteMediator(
+            service = apiService,
+            appDb = appDb,
+            postDao = postDao,
+            postRemoteKeyDao = postRemoteKeyDao
+        ),
+        pagingSourceFactory = postDao::getPagingSource,
     ).flow
+        .map {
+            it.map(PostEntity::toDto)
+        }
 
     override fun getNewerCount(latestId: Long): Flow<Int> = flow {
         while (true) {
@@ -44,7 +58,7 @@ class PostRepositoryImpl @Inject constructor(
                     throw ApiError(response.code(), response.message())
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-                dao.insert(body.toEntity().map {
+                postDao.insert(body.toEntity().map {
                     it.copy(hidden = true)
                 })
                 emit(body.size)
@@ -58,7 +72,7 @@ class PostRepositoryImpl @Inject constructor(
         .flowOn(Dispatchers.Default)
 
     override suspend fun showNewerPosts() {
-        dao.readAll()
+        postDao.readAll()
     }
 
     override suspend fun getAll() {
@@ -68,7 +82,7 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            postDao.insert(body.toEntity())
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -83,7 +97,7 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            postDao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -91,18 +105,20 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveWithAttachment(post: Post, mediaModel: MediaModel) {
+    override suspend fun saveWithAttachment(post: Post, media: MediaModel) {
         try {
-            val media = upload(mediaModel)
+            val uploadMedia = upload(media)
 
-            val response = apiService.save(post.copy(
-                attachment = Attachment(media.id, AttachmentType.IMAGE),
-            ))
+            val response = apiService.save(
+                post.copy(
+                    attachment = Attachment(uploadMedia.id, AttachmentType.IMAGE),
+                )
+            )
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            postDao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -122,19 +138,19 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeById(id: Long) {
-        val postToDelete = dao.getPostById(id)
-        dao.removeById(id)
+        val postToDelete = postDao.getPostById(id)
+        postDao.removeById(id)
         try {
             val response = apiService.removeById(id)
             if (!response.isSuccessful) {
-                dao.insert(postToDelete)
+                postDao.insert(postToDelete)
                 throw ApiError(response.code(), response.message())
             }
         } catch (e: IOException) {
-            dao.insert(postToDelete)
+            postDao.insert(postToDelete)
             throw NetworkError
         } catch (e: Exception) {
-            dao.insert(postToDelete)
+            postDao.insert(postToDelete)
             throw UnknownError
         }
     }
@@ -151,7 +167,7 @@ class PostRepositoryImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
+            postDao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
