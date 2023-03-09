@@ -2,21 +2,28 @@ package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dialog.SignInDialog
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.MediaModel
-import ru.netology.nmedia.repository.*
+import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
@@ -40,23 +47,15 @@ class PostViewModel @Inject constructor(
 ) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val data: LiveData<FeedModel> =
-        appAuth.data
-            .flatMapLatest { authState ->
-                repository.data.map { posts ->
-                    FeedModel(
-                        posts.map {
-                            it.copy(ownedByMe = authState?.id == it.authorId)
-                        },
-                        posts.isEmpty()
-                    )
+    val data: Flow<PagingData<Post>> = appAuth.authState
+        .flatMapLatest { (id, _) ->
+            repository.data.map { pagingData ->
+                pagingData.map { post ->
+                    post.copy(ownedByMe = post.authorId == id)
                 }
             }
-            .asLiveData(Dispatchers.Default)
-    val newerCount: LiveData<Int> = data.switchMap {
-        val latestPostId = it.posts.firstOrNull()?.id ?: 0L
-        repository.getNewerCount(latestPostId).asLiveData()
-    }
+        }.flowOn(Dispatchers.Default)
+
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -84,7 +83,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun isAuthorized(manager: FragmentManager): Boolean {
-        return if (appAuth.data.value != null) {
+        return if (appAuth.authState.value != AuthModel()) {
             true
         } else {
             SignInDialog().show(manager, SignInDialog.TAG)

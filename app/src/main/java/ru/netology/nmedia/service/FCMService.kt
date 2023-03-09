@@ -60,12 +60,12 @@ class FCMService : FirebaseMessagingService() {
 
     private fun checkRecipientId(message: RemoteMessage): Boolean {
         val recipientId = gson.fromJson(message.data[content], AuthMessage::class.java).recipientId
-        val authId = appAuth.data.value?.id
+        val authId = appAuth.authState.value.id
         return when {
             recipientId == authId || recipientId == null -> true
             recipientId == 0L || recipientId != 0L -> {
                 appAuth
-                    .sendPushToken(appAuth.data.value?.token)
+                    .sendPushToken(appAuth.authState.value.token)
                 false
             }
             else -> false
