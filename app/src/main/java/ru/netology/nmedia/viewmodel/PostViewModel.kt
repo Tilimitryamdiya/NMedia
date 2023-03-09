@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +46,14 @@ class PostViewModel @Inject constructor(
     private val repository: PostRepository,
     private val appAuth: AppAuth
 ) : ViewModel() {
+    private val cached = repository
+        .data
+        .cachedIn(viewModelScope)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val data: Flow<PagingData<Post>> = appAuth.authState
         .flatMapLatest { (id, _) ->
-            repository.data.map { pagingData ->
+            cached.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == id)
                 }
