@@ -15,6 +15,7 @@ data class PostEntity(
     val authorId: Long,
     val content: String,
     val published: String,
+    val ownedByMe: Boolean,
     val likes: Int = 0,
     val likedByMe: Boolean = false,
     val hidden: Boolean = false,
@@ -28,7 +29,8 @@ data class PostEntity(
             authorAvatar = authorAvatar,
             authorId = authorId,
             content = content,
-            published = published,
+            published = published.toLong(),
+            ownedByMe = ownedByMe,
             likes = likes,
             likedByMe = likedByMe,
             attachment = attachment
@@ -41,7 +43,8 @@ data class PostEntity(
             authorAvatar = post.authorAvatar,
             authorId = post.authorId,
             content = post.content,
-            published = post.published,
+            published = post.published.toString(),
+            ownedByMe = post.ownedByMe,
             likes = post.likes,
             likedByMe = post.likedByMe,
             attachment = post.attachment

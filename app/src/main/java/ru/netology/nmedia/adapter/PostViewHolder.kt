@@ -10,6 +10,9 @@ import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.view.loadAttachment
 import ru.netology.nmedia.view.loadCircleCrop
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PostViewHolder(
     private val binding: CardPostBinding,
@@ -23,7 +26,8 @@ class PostViewHolder(
         binding.apply {
             author.text = post.author
             avatar.loadCircleCrop(avatarUrl + post.authorAvatar)
-            published.text = post.published
+            published.text = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ROOT)
+                .format(Timestamp(post.published * 1000))
             content.text = post.content
             like.isChecked = post.likedByMe
             like.text = post.likes.toString()
