@@ -1,5 +1,6 @@
 package ru.netology.nmedia.adapter
 
+import ru.netology.nmedia.dto.Ad
 import ru.netology.nmedia.dto.Post
 
 interface OnInteractionListener {
@@ -10,4 +11,5 @@ interface OnInteractionListener {
     fun onPlay(post: Post) {}
     fun onPost(post: Post) {}
     fun onAttachment(post: Post)
+    fun onAd(ad: Ad) {}
 }

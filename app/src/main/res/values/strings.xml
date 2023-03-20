@@ -37,7 +37,10 @@
     <string name="description_preview">Image preview</string>
     <string name="description_choose_gallery">Choose image from the gallery</string>
     <string name="description_make_photo">Make a photo</string>
-    с
+    <string name="retry">Retry</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <!-- Authorization, registration -->
     <string name="signIn">Sign in</string>
     <string name="signOut">Sign out</string>
     <string name="register">Register</string>
@@ -54,5 +57,7 @@
     <string name="confirm_password">Confirm password</string>
     <string name="match_passwords">Passwords must match</string>
     <string name="blankRegister">Name, login or password is blank</string>
+    <string name="ad">Ad</string>
+
 
 </resources>
