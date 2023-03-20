@@ -49,13 +49,16 @@ class PostRepositoryImpl @Inject constructor(
                         null
                     }
                 }
-                .insertSeparators { previous, next ->
+                .insertSeparators (TerminalSeparatorType.SOURCE_COMPLETE){ previous, next ->
                     var type: TimeSeparatorType? = null
                     if (previous == null && next is Post) {
                         type = postTimeSeparator(null, next)
                     }
                     if (previous is Post && next is Post) {
                         type = postTimeSeparator(previous, next)
+                    }
+                    if (previous !is Post && next is Post) {
+                        type = postTimeSeparator(null, next)
                     }
 
                     if (type != null) {
